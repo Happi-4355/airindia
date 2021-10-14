@@ -97,7 +97,7 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\airIndiaFlights:airindiaflights-config">
-        <logger level="INFO" doc:name="Logger" doc:id="96576fec-48a5-481f-a924-83dfa3f1b731" message="request recevied.............." />
+        <logger level="INFO" doc:name="Logger" doc:id="96576fec-48a5-481f-a924-83dfa3f1b731" message="request recevied..............#[attributes.queryParams]" />
         <flow-ref doc:name="airIndia" doc:id="11d80d5b-147f-4b18-a582-4b5e6ccf6b2c" name="airIndiaFlow" />
         <logger level="INFO" doc:name="Logger" doc:id="69918d7a-7408-438a-8d16-fce860983e1f" message="response from...........#[payload]" />
     </flow>
