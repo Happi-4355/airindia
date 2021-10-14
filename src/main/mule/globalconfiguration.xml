@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="27ff770b-e4b1-44d6-8fbe-f2a76cb05e0c" >
+		<wsc:connection wsdlLocation="http://airindia-services.us-e2.cloudhub.io/airindia?wsdl" service="TicketServiceService" port="TicketServicePort" address="http://airindia-services.us-e2.cloudhub.io/airindia" />
+	</wsc:config>
+
+	<configuration doc:name="Configuration" doc:id="4568555a-5a03-4350-b1e5-538e92279ee0" defaultErrorHandler-ref="globalconfiguration" />
+	<error-handler name="globalconfiguration" doc:id="e908762b-7674-41e8-8f2c-805fd0fdf638" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f6e0e3a4-a2ff-44f5-83e1-d41d9cf64535" type="WSC:CONNECTIVITY, WSC:TIMEOUT">
+			<ee:transform doc:name="Transform Message" doc:id="34b085a1-1878-4479-a1f9-2b03ec3e0d53" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+{
+	message:"error from target side"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<wsc:config name="Web_Service_Consumer_Config1" doc:name="Web Service Consumer Config" doc:id="4cbec409-b77c-4b96-ba9c-fb5c4857fd7e" >
+		<wsc:connection wsdlLocation="http://airindia-services.us-e2.cloudhub.io/airindia?wsdl" service="TicketServiceService" port="TicketServicePort" address="http://airindia-services.us-e2.cloudhub.io/airindia" />
+	</wsc:config>
+	<flow name="airIndiaFlow" doc:id="729cf822-cf0f-4519-9ffb-808890dfa302" >
+		<logger level="INFO" doc:name="Logger" doc:id="f223b23b-2c5d-4150-8544-d59767b1e84c" message="flowstarts..........."/>
+		<ee:transform doc:name="Transform Message" doc:id="6c351a2d-3591-41d3-87e4-128fd4ebbf0a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://soap.training.mulesoft.com/
+---
+{
+	ns0#getFlights: {
+		from: attributes.queryParams.source as String,
+		to: attributes.queryParams.destination as String,
+		depatureDate: attributes.queryParams.doj as String
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="76842cbc-41b1-4ebf-bc01-43054f53e367" config-ref="Web_Service_Consumer_Config1" operation="getFlights"/>
+		<ee:transform doc:name="Transform Message" doc:id="2deadd35-d35a-4273-b9e6-5ba925f98407" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://soap.training.mulesoft.com/
+---
+payload.body.ns0#getFlightsResponse.*return map ( return , indexOfReturn ) -> {
+	ID: return.ID default 0,
+	airline: return.airline default "",
+	flightCode: return.flightCode default "",
+	fromAirportCode: return.fromAirportCode default "",
+	toAirportCode: return.toAirportCode default "",
+	departureDate: return.departureDate default "",
+	emptySeats: return.emptySeats default 0,
+	totalSeats: return.totalSeats as Number default 0,
+	price: return.price default 0,
+	planeType: return.planeType default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7a4cbfd0-4788-4989-a208-a92e5b29d1f8" message="final response......#[payload]"/>
+	</flow>
+</mule>
